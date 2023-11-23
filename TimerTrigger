@@ -1,0 +1,33 @@
+import os
+import shutil
+import datetime
+import logging
+import azure.functions as func
+
+def copy_file(source_path, destination_path):
+    shutil.copy(source_path, destination_path)
+
+def main(mytimer: func.TimerRequest) -> None:
+    utc_timestamp = datetime.datetime.utcnow().replace(
+        tzinfo=datetime.timezone.utc).isoformat()
+
+    logging.info(utc_timestamp)
+
+    if mytimer.past_due:
+        logging.info('The timer is past due!')
+
+    try:
+        # Replace 'source_path' and 'destination_path' with your actual paths
+        source_path = "C:\\Users\\faisa\\OneDrive\\Desktop\\Timer Trigger Function\\TimerTrigger1\\text_new.txt"
+        
+        # Format the timestamp to exclude characters not allowed in file names
+        formatted_timestamp = utc_timestamp.replace(":", "").replace("+", "")
+        destination_path = f"C:\\Users\\faisa\\OneDrive\\Desktop\\Timer Trigger Function\\archive\\{formatted_timestamp}.txt"
+
+        copy_file(source_path, destination_path)
+        logging.info(f"File moved successfully from {source_path} to {destination_path}")
+
+    except Exception as e:
+        logging.error(f"Error: {str(e)}")
+
+    logging.info('Python timer trigger function ran at %s', utc_timestamp)
